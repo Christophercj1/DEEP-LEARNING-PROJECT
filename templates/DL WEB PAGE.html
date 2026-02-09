@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>web page</title>
+    <style>
+        .bg {
+            color: white;
+            /* background-color: rgb(16, 91, 91); */
+            /* background: linear-gradient(to left, red, blue, yellow); */
+            background-image: url(./download.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            border:10px double green;
+            border-radius: 120px;
+            width: 15%;
+        }
+
+        button{
+         
+
+        }
+    </style>
+</head>
+<body>
+   
+   <fieldset>
+        <legend>FORM</legend>
+        <form method="post" enctype="multipart/form-data">
+            <label>upload a file</label>
+            <input name="image_file" type="file">
+            <button>submit</button>
+        </form>
+    </fieldset>
+    {% if p %}
+    <h3>prediction:{{p}}</h3>
+    <h3>confidence:{{c}}</h3>
+    {% endif %}
+
+   </body>
+</html>
