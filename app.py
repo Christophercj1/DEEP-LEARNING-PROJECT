@@ -1,12 +1,11 @@
+from flask import Flask, request, render_template
 import torch
 import torch.nn as nn
-from torchvision import transforms, models
+from torchvision import transforms
+from torchvision.models import resnet18, ResNet18_Weights
 from PIL import Image
 import os
-import mlflow
 import uuid
-
-from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
@@ -15,14 +14,14 @@ os.makedirs(upload_folder, exist_ok=True)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Model
-model = models.resnet18(pretrained=True)
+# Load model
+weights = ResNet18_Weights.DEFAULT
+model = resnet18(weights=weights)
 model.fc = nn.Linear(model.fc.in_features, 2)
 model.load_state_dict(torch.load("carmodel.pth", map_location=device))
 model.to(device)
 model.eval()
 
-# Transform
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -57,15 +56,9 @@ def prediction():
         pre = classes[prediction.item()]
         conf = confidence.item()
 
-        with mlflow.start_run(nested=True):
-            mlflow.log_param("image_name", filename)
-            mlflow.log_param("prediction", pre)
-            mlflow.log_metric("confidence", conf)
-
-        print("Prediction:", pre)
-        print("Confidence:", conf)
-
     return render_template("DL WEB PAGE.html", p=pre, c=conf)
 
+
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
