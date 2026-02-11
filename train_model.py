@@ -34,6 +34,7 @@ test_loader=DataLoader(test_data,batch_size=batchsize)
 
 
 model=models.resnet18(pretrained=True)
+
 for param in model.parameters():
     param.requires_grad=False
 
