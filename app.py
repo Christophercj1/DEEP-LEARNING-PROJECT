@@ -12,15 +12,20 @@ app = Flask(__name__)
 upload_folder = "static/uploads"
 os.makedirs(upload_folder, exist_ok=True)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 
 # Load model
-weights = ResNet18_Weights.DEFAULT
-model = resnet18(weights=weights)
-model.fc = nn.Linear(model.fc.in_features, 2)
-model.load_state_dict(torch.load("carmodel.pth", map_location=device))
-model.to(device)
-model.eval()
+model=None
+def getmodel():
+    global model
+    if model is None:
+
+        weights = ResNet18_Weights.DEFAULT
+        model = resnet18(weights=weights)
+        model.fc = nn.Linear(model.fc.in_features, 2)
+        model.load_state_dict(torch.load("carmodel.pth", map_location=device))
+        model.to(device)
+        model.eval()
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -47,6 +52,7 @@ def prediction():
         image_file = transform(image_file).unsqueeze(0).to(device)
 
         with torch.no_grad():
+            model=getmodel()
             output = model(image_file)
             prob = torch.softmax(output, dim=1)
 
